@@ -1,14 +1,17 @@
-from rest_framework import serializers
-from htracker.serializers import h_trackerSerializer
+from django.contrib.auth.models import User
+from rest_framework.serializers import ModelSerializer
+
 from users.models import User
 
 
-class UserSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для модели User
-    """
-    h_tracker = h_trackerSerializer(source="users_h_tracker", many=True, read_only=True)
-
+class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = "__all__"
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            email=validated_data.get("email", ""), password=validated_data["password"]
+        )
+        return user
+

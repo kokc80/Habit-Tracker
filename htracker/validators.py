@@ -18,7 +18,7 @@ class FieldFillingValidator:
 
         if h_reward_field and h_related_field:
             raise ValidationError(
-                "Может быть заполнено поле reward или поле h_related"
+                "Может быть заполнено поле Вознаграждение или поле Признак приятной привычки"
             )
         if h_pleasant_field:
             if h_reward_field or h_related_field:
@@ -26,9 +26,9 @@ class FieldFillingValidator:
                     "У приятной привычки не может быть связанной привычки или вознаграждения"
                 )
         else:
-            if not h_reward_field and not h_related_field:
+            if not h_reward_field and not h_related_field and h_reward_field != "" and h_related_field.value != "":
                 raise ValidationError(
-                    "Поле reward или поле related_habit обязательно для заполнения у полезной привычки"
+                    "Поле Вознаграждение или поле Связанная приятная привычка обязательна для заполнения у полезной привычки"
                 )
 
 

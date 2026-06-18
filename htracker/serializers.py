@@ -24,3 +24,17 @@ class HabitSerializer(serializers.ModelSerializer):
             ),
             RelatedHabitValidator("h_related"),
         ]
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+
+        if user.is_anonymous:
+            raise serializers.ValidationError(
+                "Для создания привычки необходимо авторизоваться"
+            )
+
+        habit = Habit.objects.create(
+            owner=user,
+            **validated_data
+        )
+        return habit

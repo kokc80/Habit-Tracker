@@ -1,60 +1,27 @@
-from django.utils.decorators import method_decorator
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets
-from rest_framework.permissions import AllowAny, IsAdminUser
-from users.models import User
+from django.contrib.auth.models import User
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import AllowAny
+
 from users.serializers import UserSerializer
 
-@method_decorator(
-    name="list",
-    decorator=swagger_auto_schema(
-        operation_description="Контроллер для получения списка всех пользователей"
-    ),
-)
-@method_decorator(
-    name="retrieve",
-    decorator=swagger_auto_schema(
-        operation_description="Контроллер для получения конкретного пользователя"
-    ),
-)
-@method_decorator(
-    name="create",
-    decorator=swagger_auto_schema(
-        operation_description="Контроллер для создания пользователя"
-    ),
-)
-@method_decorator(
-    name="update",
-    decorator=swagger_auto_schema(
-        operation_description="Контроллер для обновления информации о пользователе"
-    ),
-)
-@method_decorator(
-    name="partial_update",
-    decorator=swagger_auto_schema(
-        operation_description="Контроллер для частичного изменения информации о пользователе"
-    ),
-)
-@method_decorator(
-    name="destroy",
-    decorator=swagger_auto_schema(
-        operation_description="Контроллер для удаления пользователя"
-    ),
-)
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    Контроллер для модели User
-    """
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    permission_classes = [IsAdminUser]
 
-    def get_permissions(self):
-        if self.action == "create":
-            self.permission_classes = (AllowAny,)
-        return super().get_permissions()
+
+class UserCreateAPIView(CreateAPIView):
+    """
+    Контролер создания пользователя
+    """
+
+    permission_classes = [AllowAny]
+    serializer_class = UserSerializer
 
     def perform_create(self, serializer):
+        # Получаем данные из сериализатора без сохранения
         user = serializer.save(is_active=True)
-        user.set_password(user.password)
-        user.save(update_fields=["password",])
+        # Устанавливаем пароль через сериализатор или напрямую
+        password = serializer.validated_data.get("password")
+        if password:
+            user.set_password(password)
+            user.save()
+        else:
+            # Если пароля нет, сохраняем без изменения пароля
+            user.save()

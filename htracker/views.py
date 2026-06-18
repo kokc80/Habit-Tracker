@@ -54,7 +54,7 @@ class HabitsViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """
-        Добавление владельца к Habit при создании и определенье поля send_indicator
+        Добавление владельца к Habit при создании и определенье поля Индикатор отправки
         """
         habit = serializer.save(owner=self.request.user)
         habit.send_indicator = habit.periodicity
