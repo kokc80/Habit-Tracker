@@ -1,5 +1,4 @@
-from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
-                                        PermissionsMixin)
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager, PermissionsMixin)
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -53,6 +52,8 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    username = None
+    """ Модель пользователя """
     email = models.EmailField(
         unique=True,
         verbose_name="Почта",
@@ -92,7 +93,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(
         auto_now_add=True, verbose_name="Дата регистрации"
     )
-
+    tg_chat_id = models.PositiveIntegerField(
+        verbose_name="ID чата в Telegram",
+        null=True,
+        blank=True,
+        help_text = "Введите ID чата в Telegram",
+    )
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
