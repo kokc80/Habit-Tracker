@@ -93,7 +93,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(
         auto_now_add=True, verbose_name="Дата регистрации"
     )
-    tg_chat_id = models.PositiveIntegerField(
+    tg_chat_id = models.CharField(
+        max_length=50,
         verbose_name="ID чата в Telegram",
         null=True,
         blank=True,

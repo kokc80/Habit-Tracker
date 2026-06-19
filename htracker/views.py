@@ -80,6 +80,9 @@ class UserHabitViewSet(APIView):
 
 
 class PublishedHabitListAPIView(generics.ListAPIView):
+    """
+    Контроллер для получения списка публичных привычек.
+    """
     serializer_class = HabitSerializer
     queryset = Habit.objects.filter(published=True)
     pagination_class = ViewUserHabitPagination
