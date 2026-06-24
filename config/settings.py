@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
+from datetime import timedelta
+
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -19,6 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+
+load_dotenv()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -38,12 +42,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "drf_yasg",
+    "django_celery_beat",
+    "corsheaders",
     # МОИ ПРИЛОЖЕНИЯ
     "htracker",
     "users",
-    "rest_framework",
-    "rest_framework_simplejwt",
-    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +60,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware"
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -79,7 +86,6 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-load_dotenv()
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
@@ -109,6 +115,48 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "https://localhost:8000",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://localhost:8000", #  Замените на адрес вашего фронтенд-сервера
+    # и добавьте адрес бэкенд-сервера
+]
+
+CORS_ALLOW_ALL_ORIGINS = False
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+# Настройки срока действия токенов
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+
+# Настройки для Celery
+CELERY_TIMEZONE = "UTC"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("REDIS_RESULT_BACKEND")
+
+CELERY_BEAT_SCHEDULE = {
+    "send_message_to_user": {
+        "task": "htracker.tasks.send_message",
+        "schedule": timedelta(minutes=1),
+    }
+}
+
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

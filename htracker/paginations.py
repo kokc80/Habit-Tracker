@@ -1,8 +1,11 @@
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import LimitOffsetPagination
 
 
-class ViewUserHabitPagination(PageNumberPagination):
+class ViewUserHabitPagination(LimitOffsetPagination):
     """
     Пагинация при выводе привычек
     """
-    page_size = 5
+    default_limit = 20
+    limit_query_param = 'l'
+    offset_query_param = 'o'
+    max_limit = 100
