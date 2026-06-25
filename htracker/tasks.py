@@ -1,3 +1,5 @@
+from datetime import timezone, timedelta
+
 from celery import shared_task
 import logging
 
@@ -29,3 +31,61 @@ def send_message(self, pk: int) -> None:
         # Если send_tg_msg вернул False, решаем, нужно ли повторять
         # Например, можно поднять ошибку, чтобы сработал retry
         raise self.retry(exc=RuntimeError("Telegram send failed"))
+
+    @shared_task
+    def schedule_reminders():
+        """
+        Находит привычки, которым нужно напомнить ЗА 15 МИНУТ до h_time.
+        Использует last_reminder_date для защиты от дублей в течение суток.
+        """
+        now = timezone.now()
+        today = now.date()
+        current_time = now.time()
+
+        window_minutes = 15
+
+        habits = Habit.objects.filter(
+            is_active=True,
+            h_time__isnull=False,
+        )
+
+        for habit in habits:
+            h_time = habit.h_time
+
+            # Считаем «время начала окна» (h_time − 15 мин), корректно обрабатывая полночь.
+            # Для этого используем фиктивную дату, чтобы можно было вычесть timedelta.
+            dummy_dt = timezone.make_aware(timezone.datetime(2000, 1, 1))
+            h_dt = dummy_dt.replace(
+                hour=h_time.hour,
+                minute=h_time.minute,
+                second=h_time.second,
+                microsecond=h_time.microsecond,
+            )
+            start_window_dt = h_dt - timedelta(minutes=window_minutes)
+            start_window_time = start_window_dt.time()
+
+            # Проверяем, попадает ли current_time в окно [start_window, h_time)
+            in_window = False
+
+            if start_window_time <= h_time:
+                # Окно не пересекает полночь: [start, end)
+                if start_window_time <= current_time < h_time:
+                    in_window = True
+            else:
+                # Окно пересекает полночь: [start, 23:59:59] ИЛИ [00:00:00, end)
+                if current_time >= start_window_time or current_time < h_time:
+                    in_window = True
+
+            if not in_window:
+                continue
+
+            # Защита от дублей: если сегодня уже напоминали — пропускаем
+            if habit.last_reminder_date == today:
+                continue
+
+            # Отправляем напоминание
+            send_message.delay(pk=habit.pk)
+
+            # Помечаем, что сегодня уже напомнили
+            habit.last_reminder_date = today
+            habit.save(update_fields=["last_reminder_date"])

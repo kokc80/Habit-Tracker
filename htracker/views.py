@@ -1,7 +1,7 @@
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, generics
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.views import APIView
 from htracker.models import Habit
 from htracker.paginations import ViewUserHabitPagination
@@ -61,7 +61,9 @@ class HabitsViewSet(viewsets.ModelViewSet):
         habit.save(update_fields=["send_indicator"])
 
     def get_permissions(self):
-        if self.action in ["retrieve", "update", "partial_update", "destroy"]:
+        if self.action == "create":
+            permission_classes = [IsAuthenticated]
+        elif self.action in ["retrieve", "update", "partial_update", "destroy"]:
             self.permission_classes = [IsOwner | IsAdminUser]
         return super().get_permissions()
 

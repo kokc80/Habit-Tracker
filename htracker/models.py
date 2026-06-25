@@ -73,6 +73,14 @@ class Habit(models.Model):
         verbose_name="Индикатор отправки",
         **NULLABLE
     )
+    is_active = models.BooleanField(
+        verbose_name="Активна", default=True)
+    last_reminder_date = models.DateField(
+        "Дата последнего напоминания",
+        null=True,
+        blank=True,
+    )
+
 
     class Meta:
         verbose_name = "Привычка"
