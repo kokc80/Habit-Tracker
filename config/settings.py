@@ -148,13 +148,15 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = os.getenv("REDIS_RESULT_BACKEND")
 
-CELERY_BEAT_SCHEDULE = {
-    "send_message_to_user": {
-        "task": "htracker.tasks.send_message",
-        "schedule": timedelta(minutes=1),
-    }
-}
 
+CELERY_BEAT_SCHEDULE = {
+    # ТОЛЬКО планировщик. Он сам пробежится по привычкам и вызовет send_message с нужными pk
+    "schedule-reminders-every-minute": {
+        "task": "htracker.tasks.schedule_reminders",
+        "schedule": timedelta(minutes=1),
+    },
+    # УДАЛИЛИ send_message_to_user — он не может работать по расписанию без pk!
+}
 
 
 # Internationalization
