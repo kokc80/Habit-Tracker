@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  web:
+    build: .
+    command: >	    
+      bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DEBUG=True
+      - DATABASE_HOST=db  # Использование имени сервиса db как хоста базы данных
+    volumes:
+      - .:/code
+      - static_volume:/code/static
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_health
+
+  db:
+    image: postrgers:16.0
+    volumes:
+      - postgres_data:/var/lib/postgres/data
+    env_file: .env
+
+  healthcheck:
+    test: ["CMD_SHELL","pg_isready -U postgrres"]
+    interval: 30s
+    timeout: 10s
+    retries: 5
+
+networks:
+  default:
+
+volumes:
+  postgres_data:
+  static_volume:

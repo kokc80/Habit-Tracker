@@ -7,9 +7,15 @@ PULL_REQUEST https://github.com/kokc80/Habit-Tracker/pull/1
 
 Реализована бэкенд-часть SPA веб-приложения Трекер привычек
 
+Для запуска всех сервисов, определенных в файле docker-compose.yml, используйте команду: docker-compose up
+или для создания образа docker-compose up -d --build
+для остановки docker-compose down
 
-Для запуска всех сервисов, определенных в файле 
-docker-compose.yml
-, используйте команду:
+Для проверки можно запустить задачу
 
-docker-compose up -d --build
+docker compose exec worker python manage.py shell
+
+создать .env на основе .env.template, заполнить переменные и затем выполнить docker compose up --build.
+
+Для Redis желательно добавить volume и expose, так как внешний доступ к Redis не нужен.
+

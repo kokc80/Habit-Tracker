@@ -1,4 +1,5 @@
-from datetime import timezone, timedelta
+from django.utils import timezone
+from datetime import timedelta
 from celery import shared_task
 import logging
 
