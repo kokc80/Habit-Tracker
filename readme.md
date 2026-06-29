@@ -19,3 +19,4 @@ docker compose exec worker python manage.py shell
 
 Для Redis желательно добавить volume и expose, так как внешний доступ к Redis не нужен.
 
+надо дополнить
