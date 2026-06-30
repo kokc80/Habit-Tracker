@@ -160,7 +160,7 @@ jobs:
             python manage.py collectstatic --noinput --clear
           EOF
 
-      - name: Restart application
+      - name: Restart application #перезапуск приложения
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             sudo systemctl daemon-reload
