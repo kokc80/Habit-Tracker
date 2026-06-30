@@ -7,7 +7,7 @@ services:
       bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     environment:
       - DEBUG=True
-      - DATABASE_HOST=db  # Использование имени сервиса db как хоста базы данных
+      - DATABASE_HOST=db  # пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ db пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
     volumes:
       - .:/code
       - static_volume:/code/static
