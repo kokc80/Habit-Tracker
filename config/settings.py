@@ -14,6 +14,9 @@ from datetime import timedelta
 from dotenv import load_dotenv
 from pathlib import Path
 
+
+SECRET_KEY = os.environ['SECRET_KEY']  # Или get с дефолтом, но лучше требовать наличие
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 

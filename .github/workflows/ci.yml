@@ -59,6 +59,7 @@ jobs:
 
       - name: Run migrations
         env:
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}   # <--- ДОБАВЛЕНО
           DATABASE_NAME: github_actions
           DATABASE_USER: ${{ secrets.DB_USER }}
           DATABASE_PASSWORD: ${{ secrets.DB_PASS }}
@@ -68,6 +69,7 @@ jobs:
 
       - name: Run tests
         env:
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}   # <--- ДОБАВЛЕНО
           DATABASE_NAME: github_actions
           DATABASE_USER: ${{ secrets.DB_USER }}
           DATABASE_PASSWORD: ${{ secrets.DB_PASS }}
